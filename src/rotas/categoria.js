@@ -9,3 +9,4 @@ rotas.use(validacaoToken);
 rotas.get('/', listarCategorias);
 
 module.exports = rotas;
+
