@@ -91,3 +91,5 @@ module.exports = {
   possuiTransacoes,
   stringFiltro
 }
+
+
