@@ -21,3 +21,4 @@ rotas.put('/:id', atualizarTransacao);
 rotas.delete('/:id', deletarTransacao);
 
 module.exports = rotas
+
