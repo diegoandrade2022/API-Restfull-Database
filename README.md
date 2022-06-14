@@ -35,7 +35,7 @@ Seu papel é construir uma RESTful API que permita:
 }
 ```
 
-## ** Pacotes Utilizados**
+## **Pacotes Utilizados**
 
 - express
 - node-postgres
