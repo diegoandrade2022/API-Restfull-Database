@@ -39,3 +39,5 @@ VALUES
 ('Família'), ('Lazer'), ('Pets'), ('Presentes'),
 ('Roupas'), ('Saúde'), ('Transporte'), ('Salário'), 
 ('Vendas'), ('Outras Receitas'), ('Outras Despesas')
+
+
