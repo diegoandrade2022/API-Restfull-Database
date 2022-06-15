@@ -1,6 +1,6 @@
-Apresentação do III Desafio do Curso de Backend da Cubos Academy!
+**Apresentação do III Desafio do Curso de Backend da Cubos Academy!**
 
-Implementação de uma API RestFull com Banco de Dados
+**Implementação de uma API RestFull com Banco de Dados SQL**
 
 ![](https://i.imgur.com/xG74tOh.png)
 
@@ -35,7 +35,7 @@ Seu papel é construir uma RESTful API que permita:
 }
 ```
 
-## ** Pacotes Utilizados**
+## **Pacotes Utilizados**
 
 - express
 - node-postgres

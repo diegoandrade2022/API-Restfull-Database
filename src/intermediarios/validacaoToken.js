@@ -46,3 +46,4 @@ const validacaoToken = async (req, res, next) => {
 }
 
 module.exports = { validacaoToken }
+

@@ -13,3 +13,4 @@ rotas.put('/', atualizarUsuario);
 
 
 module.exports = rotas
+
