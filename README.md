@@ -59,12 +59,13 @@ Você precisa criar um Banco de Dados PostgreSQL chamado `dindin` contendo as se
     -   descricao
 -   transacoes
     -   id
+    -   tipo
     -   descricao
     -   valor
     -   data
-    -   categoria_id
     -   usuario_id
-    -   tipo
+    -   categoria_id
+
 
 **IMPORTANTE: Deverá ser criado no projeto o(s) arquivo(s) SQL que deverá ser o script que cria as tabelas corretamente.**
 
