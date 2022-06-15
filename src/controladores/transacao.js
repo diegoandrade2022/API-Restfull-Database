@@ -141,10 +141,11 @@ const atualizarTransacao = async (req, res) => {
       [descricao, valor, data, categoria_id, tipo, id, logado.id]
     )
 
-    if (atualizar.rowCount > 0) {
-      return res.status(204).json()
+    if (atualizar.rowCount <= 0) {
+      return res.status(404).json({ menssagem: 'Transação não encontrada' })
     }
-    return res.status(404).json({ menssagem: 'Transação não encontrada' })
+
+    return res.status(204).json()
   } catch (error) {
     return res.status(400).json({ menssagem: error.message })
   }
