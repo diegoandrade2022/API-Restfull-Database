@@ -15,20 +15,20 @@ CREATE TABLE IF NOT EXISTS categorias (
 
 CREATE TABLE IF NOT EXISTS transacoes (
   id serial primary key,
+  tipo varchar(7) check (tipo = 'entrada' or tipo = 'saida') not null,
   descricao text not null,
   valor int not null,
   data date not null,
-  categoria_id int not null,
-  usuario_id int not null,
-  tipo varchar(7) check (tipo = 'entrada' or tipo = 'saida') not null,
-  CONSTRAINT fk_transacoes_categorias 
-  foreign key (categoria_id) references categorias(id) 
-  ON DELETE CASCADE 
-  ON UPDATE CASCADE,
+  usuario_id int not null, 
+  categoria_id int not null, 
   CONSTRAINT fk_transacoes_usuarios 
   foreign key (usuario_id) references usuarios(id)
   ON DELETE CASCADE 
-  ON UPDATE CASCADE
+  ON UPDATE CASCADE,  
+  CONSTRAINT fk_transacoes_categorias 
+  foreign key (categoria_id) references categorias(id) 
+  ON DELETE CASCADE 
+  ON UPDATE CASCADE  
 );
 
 INSERT INTO categorias (
