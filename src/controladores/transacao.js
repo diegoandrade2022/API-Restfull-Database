@@ -77,7 +77,7 @@ const cadastrarTransacao = async (req, res) => {
       return res.status(400).json({ messagem: 'Categoria não encontrada' })
     }
 
-    const { rows: transacoes, rowCount } = await query(
+    const { rows, rowCount } = await query(
       'INSERT INTO transacoes (descricao, valor, data, categoria_id, tipo, usuario_id) VALUES ($1, $2,$3, $4, $5, $6) RETURNING *',
       [descricao, valor, data, categoria_id, tipo, logado.id]
     )
@@ -86,16 +86,10 @@ const cadastrarTransacao = async (req, res) => {
       return res.status(400).json({ messagem: 'Transação não cadastrada' })
     }
 
-    return res.status(201).json({
-      id: transacoes[0].id,
-      tipo: transacoes[0].tipo,
-      descricao: transacoes[0].descricao,
-      valor: transacoes[0].valor,
-      data: transacoes[0].data,
-      usuario_id: logado.id,
-      categoria_id: transacoes[0].categoria_id,
-      categoria_nome: categoria.rows[0].descricao
-    })
+    const [transacao] = rows
+    transacao.categoria_nome = categoria.rows[0].descricao
+
+    return res.status(201).json(transacao)
   } catch (error) {
     return res.status(400).json({ messagem: error.message })
   }
