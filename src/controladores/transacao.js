@@ -1,21 +1,31 @@
 const { query } = require('../bancodedados/conexao')
-const { existeCategoria, transacaoExiste, possuiTransacoes, stringFiltro } = require('../uteis/validacoes')
+const { existeCategoria, transacaoExiste } = require('../uteis/validacoes')
 
 const listarTransacoes = async (req, res) => {
   let { logado } = req
-  let filtro = req.query.filtro
+  let { filtro } = req.query;
+
+  if (filtro && !Array.isArray(filtro)) {
+    return res.status(400).json({ messagem: 'O filtro tem que ser um array' })
+  }
 
   try {
-    let array = filtro ? filtro : false
-    filtro = stringFiltro(array)
+    let ilike = '';
+    let arrayFiltro;
 
-    let { rows: transacoes } = await query(
-      `SELECT t.id, t.tipo, t.descricao, t.valor, t.data, t.usuario_id, t.categoria_id, 
-      c.descricao as nome_categoria FROM transacoes t 
-      JOIN categorias c ON t.categoria_id = c.id 
-      WHERE t.usuario_id = $1 ${filtro}`,
-      [logado.id]
-    )
+    if (filtro) {
+      arrayFiltro = filtro.map(f => `%${f}%`);
+      ilike += `AND c.descricao ILIKE ANY($2)`;
+    }
+
+    const transacoesQuery = `SELECT t.*, c.descricao as categoria_nome FROM transacoes t 
+    LEFT JOIN categorias c ON t.categoria_id = c.id 
+    WHERE t.usuario_id = $1 
+    ${ilike}`;
+
+    const existeFiltro = filtro ? [logado.id, arrayFiltro] : [logado.id];
+
+    const { rows: transacoes } = await query(transacoesQuery, existeFiltro);
 
     return res.status(200).json(transacoes)
   } catch (error) {
@@ -167,14 +177,16 @@ const deletarTransacao = async (req, res) => {
     }
 
     const deletar = await query(
-      'DELETE FROM transacoes WHERE id = $1 AND usuario_id = $2',
-      [id, logado.id]
+      'DELETE FROM transacoes WHERE id = $1',
+      [id]
     )
 
-    if (deletar.rowCount > 0) {
-      return res.status(204).json()
+    if (deletar.rowCount <= 0) {
+      return res.status(404).json({ menssagem: 'Não foi possível deletar transação' })
     }
-    return res.status(404).json({ menssagem: 'Não foi possível deletar transação' })
+
+    return res.status(204).json()
+
   } catch (error) {
     return res.status(400).json({ menssagem: error.message })
   }
@@ -184,31 +196,16 @@ const demonstrarExtrato = async (req, res) => {
   const { logado } = req
 
   try {
-    let transacao = await possuiTransacoes(logado.id)
+    const extrato = 'SELECT sum(valor) as saldo FROM transacoes WHERE usuario_id = $1 and tipo = $2'
 
-    if (!transacao) {
-      return res.status(404).json({ menssagem: 'Você não possui transações' })
-    }
-    const entradas = await query(
-      'SELECT sum(valor) FROM transacoes WHERE tipo = $2 and usuario_id = $1;',
-      [logado.id, 'entrada']
-    )
+    const entrada = await query(extrato, [logado.id, 'entrada'])
+    const saida = await query(extrato, [logado.id, 'saida'])
 
-    const saidas = await query(
-      'SELECT sum(valor) FROM transacoes WHERE tipo = $2 and usuario_id = $1;',
-      [logado.id, 'saida']
-    )
+    return res.status(200).json({
+      entrada: Number(entrada.rows[0].saldo) ?? 0,
+      saida: Number(saida.rows[0].saldo) ?? 0
+    })
 
-    if (entradas.rowCount > 0 && saidas.rowCount > 0) {
-      let entrada = Number(entradas.rows[0].sum)
-      let saida = Number(saidas.rows[0].sum)
-
-      return res.status(200).json({
-        entrada: entrada > 0 ? entrada : 0,
-        saida: saida > 0 ? saida : 0
-      })
-    }
-    return res.status(404).json({ menssagem: 'Não foi possível demonstrar  extrato' })
   } catch (error) {
     return res.status(400).json({ menssagem: error.message })
   }
